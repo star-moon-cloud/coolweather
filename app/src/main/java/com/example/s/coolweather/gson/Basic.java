@@ -14,5 +14,5 @@ public  String weatherId;
 public Update update;
 public class Update{
 @SerializedName("loc")
-public String updatetime;}
+public String updateTime;}
 }

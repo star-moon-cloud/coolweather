@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.s.coolweather.gson.Forecast;
 import com.example.s.coolweather.gson.Weather;
+import com.example.s.coolweather.service.AutoUpdateService;
 import com.example.s.coolweather.util.HttpUtil;
 import com.example.s.coolweather.util.Utility;
 
@@ -31,18 +32,10 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-/**
- * Created by s on 2017/8/13.
- */
-
 public class WeatherActivity extends AppCompatActivity {
-    public DrawerLayout drawerLayout;
-
-    public SwipeRefreshLayout swipeRefresh;
 
     private ScrollView weatherLayout;
 
-    private Button navButton;
 
     private TextView titleCity;
 
@@ -64,15 +57,13 @@ public class WeatherActivity extends AppCompatActivity {
 
     private TextView sportText;
 
-    private ImageView bingPicImg;
-
-    private String mWeatherId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
         // 初始化各控件
+
         weatherLayout = (ScrollView) findViewById(R.id.weather_layout);
         titleCity = (TextView) findViewById(R.id.title_city);
         titleUpdateTime = (TextView) findViewById(R.id.title_update_time);
@@ -89,21 +80,19 @@ public class WeatherActivity extends AppCompatActivity {
         if (weatherString != null) {
             // 有缓存时直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
-            mWeatherId = weather.basic.weatherId;
             showWeatherInfo(weather);
         } else {
             // 无缓存时去服务器查询天气
-            mWeatherId = getIntent().getStringExtra("weather_id");
-            weatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(mWeatherId);
-        }
-    }
+            String weatherId = getIntent().getStringExtra("weather_id");
+            weatherLayout.setVisibility(View.VISIBLE);
+            requestWeather(weatherId);
+        }}
 
     /**
      * 根据天气id请求城市天气信息。
      */
     public void requestWeather(final String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=bc0418b57b2d4918819d3974ac1285d9";
+        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=876e619acd5e45a192ce5227ea3ae6e7";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -112,7 +101,7 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (weather != null && "ok".equals(weather.statuse)) {
+                        if (weather != null && "ok".equals(weather.status)) {
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                             editor.putString("weather", responseText);
                             editor.apply();
@@ -131,19 +120,19 @@ public class WeatherActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
-                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
         });
     }
 
+
     /**
      * 处理并展示Weather实体类中的数据。
      */
     private void showWeatherInfo(Weather weather) {
         String cityName = weather.basic.cityName;
-        String updateTime = weather.basic.update.updatetime.split(" ")[1];
+        String updateTime = weather.basic.update.updateTime.split(" ")[1];
         String degree = weather.now.temperature + "℃";
         String weatherInfo = weather.now.more.info;
         titleCity.setText(cityName);

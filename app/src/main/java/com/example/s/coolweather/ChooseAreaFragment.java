@@ -137,7 +137,7 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCities(){
         titleText.setText(selectedProvince.getProvinceName());
         backButton.setVisibility(View.VISIBLE);
-        cityList = DataSupport.where("province=?", String.valueOf(selectedProvince.getId())).find(City.class);
+        cityList = DataSupport.where("provinceid=?", String.valueOf(selectedProvince.getId())).find(City.class);
         if (cityList.size()>0){
             dataList.clear();
             for (City city:cityList){
@@ -148,7 +148,7 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         }else{
             int provinceCode= selectedProvince.getProvinceCode();
-            String address = "http://guolin.tech/api/china"+provinceCode;
+            String address = "http://guolin.tech/api/china/"+provinceCode;
             queryFromServer(address,"city");
         }
     }
@@ -158,7 +158,7 @@ public class ChooseAreaFragment extends Fragment {
     private void queryCounties(){
         titleText.setText(selectedCity.getcityName());
         backButton.setVisibility(View.VISIBLE);
-        countyList = DataSupport.where("city=?", String.valueOf(selectedCity.getId())).find(County.class);
+        countyList = DataSupport.where("cityid=?", String.valueOf(selectedCity.getId())).find(County.class);
         if (countyList.size()>0){
             dataList.clear();
             for (County county:countyList){
@@ -170,7 +170,7 @@ public class ChooseAreaFragment extends Fragment {
         }else{
             int provinceCode= selectedProvince.getProvinceCode();
             int citycode = selectedCity.getcityCode();
-            String address = "http://guolin.tech/api/china"+provinceCode+"/"+citycode;
+            String address = "http://guolin.tech/api/china/"+provinceCode+"/"+citycode;
             queryFromServer(address,"county");
         }
     }
